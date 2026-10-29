@@ -16,8 +16,8 @@ function StatCard({ label, value, subtitle, variant }) {
 
 /**
  * Componente Header:
- * Exibe o título da aplicação, navegação principal, barra de progresso e indicadores gerais
- * recebidos via Props do componente Pai (App).
+ * Exibe o título da aplicação, navegação principal via React Router (NavLink),
+ * barra de progresso e indicadores gerais recebidos via Props do componente Pai (App).
  */
 export default function Header({
   appTitle,
@@ -72,7 +72,7 @@ export default function Header({
     <header className="app-header">
       <div className="header-top">
         <div className="brand-block">
-          <div className="brand-badge">REACT 18 • FUNDAMENTOS NA PRÁTICA</div>
+          <div className="brand-badge">REACT 18 • 11 CONCEITOS NA PRÁTICA</div>
           <h1 className="brand-title">{appTitle}</h1>
           <p className="brand-subtitle">{appSubtitle}</p>
         </div>
@@ -93,7 +93,7 @@ export default function Header({
               `nav-link ${isActive ? 'nav-link-active' : ''}`
             }
           >
-            🧭 Mapeamento de Requisitos
+            🧭 11 Conceitos (Guia)
           </NavLink>
         </nav>
       </div>
@@ -138,4 +138,3 @@ export default function Header({
     </header>
   );
 }
-

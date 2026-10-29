@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { Routes, Route, Link } from 'react-router-dom';
 import Header from './components/Header';
 import TaskForm from './components/TaskForm';
 import SearchInput from './components/SearchInput';
@@ -13,11 +13,12 @@ const STORAGE_KEY = 'focusflow_react_tasks_v1';
 
 /**
  * Componente Raiz App:
- * Centraliza o estado principal das metas, persiste alterações no localStorage via useEffect,
- * contabiliza reconciliações do Virtual DOM e distribui dados/callbacks via Props para os componentes filhos.
+ * Centraliza o estado principal das metas (useState), sincroniza alterações com sistemas
+ * externos (localStorage e document.title) via useEffect, gerencia as rotas com React Router
+ * e distribui dados/callbacks via Props para os componentes filhos.
  */
 export default function App() {
-  // Inicialização de estado com leitura do localStorage ou coleção inicial padrão
+  // 07. State e useState: Inicialização preguiçosa (lazy initialization) lendo do localStorage
   const [tasks, setTasks] = useState(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
@@ -27,24 +28,32 @@ export default function App() {
     }
   });
 
-  // Estados de busca e filtragem
+  // Estados de busca e filtragem combinada
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [categoryFilter, setCategoryFilter] = useState('todas');
   const [priorityFilter, setPriorityFilter] = useState('todas');
 
-  // Telemetria didática para demonstrar o funcionamento do Virtual DOM
+  // Telemetria didática para demonstrar o funcionamento do Virtual DOM (04)
   const [vdomUpdatesCount, setVdomUpdatesCount] = useState(1);
   const [lastVdomAction, setLastVdomAction] = useState(
     'Renderização inicial dos componentes na árvore Virtual DOM'
   );
 
-  const registerVdomUpdate = (actionDescription) => {
+  const registerVdomUpdate = useCallback((actionDescription) => {
     setVdomUpdatesCount((prev) => prev + 1);
     setLastVdomAction(actionDescription);
-  };
+  }, []);
 
-  // Efeito colateral (useEffect) para sincronizar o estado com o localStorage
+  // Indicadores derivados do estado atual
+  const totalTasks = tasks.length;
+  const completedTasks = tasks.filter((t) => t.completed).length;
+  const pendingTasks = totalTasks - completedTasks;
+  const highPriorityPending = tasks.filter(
+    (t) => !t.completed && t.priority === 'alta'
+  ).length;
+
+  // 09. useEffect #1: Sincroniza o estado `tasks` com a Web Storage API (localStorage)
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
@@ -52,6 +61,14 @@ export default function App() {
       // Ignora erro caso o armazenamento esteja indisponível
     }
   }, [tasks]);
+
+  // 09. useEffect #2: Sincroniza o título da aba do navegador (DOM externo) com o total de pendências
+  useEffect(() => {
+    document.title =
+      pendingTasks > 0
+        ? `(${pendingTasks} pendentes) FocusFlow — Gerenciador de Metas React`
+        : 'FocusFlow — Todas as metas concluídas! 🎉';
+  }, [pendingTasks]);
 
   // Funções manipuladoras de estado imutável (passadas via Props para componentes filhos)
   const handleAddTask = (newTaskData) => {
@@ -146,14 +163,6 @@ export default function App() {
     });
   }, [tasks, searchTerm, statusFilter, categoryFilter, priorityFilter]);
 
-  // Indicadores derivados do estado atual
-  const totalTasks = tasks.length;
-  const completedTasks = tasks.filter((t) => t.completed).length;
-  const pendingTasks = totalTasks - completedTasks;
-  const highPriorityPending = tasks.filter(
-    (t) => !t.completed && t.priority === 'alta'
-  ).length;
-
   const hasActiveFilters =
     searchTerm.trim() !== '' ||
     statusFilter !== 'all' ||
@@ -165,7 +174,7 @@ export default function App() {
       <div className="app-container">
         <Header
           appTitle="FocusFlow — Gerenciador de Tarefas e Metas"
-          appSubtitle="Painel interativo em React demonstrando JSX, Componentes, Props, Listas & Keys, Renderização Condicional e Virtual DOM."
+          appSubtitle="Painel interativo em React aplicando os 11 conceitos: JSX, Componentes, Props, Virtual DOM, Listas e Keys, Renderização Condicional, State/useState, Formulários, useEffect, Consumo de APIs e React Router."
           totalTasks={totalTasks}
           completedTasks={completedTasks}
           pendingTasks={pendingTasks}
@@ -175,6 +184,7 @@ export default function App() {
         />
 
         <main className="app-main">
+          {/* 11. React Router: Organização de páginas e navegação declarativa por URLs */}
           <Routes>
             <Route
               path="/"
@@ -184,6 +194,7 @@ export default function App() {
                     onAddTask={handleAddTask}
                     categories={CATEGORIES}
                     priorities={PRIORITIES}
+                    existingTasks={tasks}
                   />
 
                   <SearchInput
@@ -228,12 +239,31 @@ export default function App() {
                     completedCount={completedTasks}
                   />
 
-                  <ApiSuggestionsPanel onImportSuggestion={handleAddTask} />
+                  <ApiSuggestionsPanel
+                    onImportSuggestion={handleAddTask}
+                    onApiSync={registerVdomUpdate}
+                  />
                 </>
               }
             />
 
             <Route path="/requisitos" element={<RequirementsGuide />} />
+
+            <Route
+              path="*"
+              element={
+                <div className="card-panel empty-state-card">
+                  <div className="empty-state-icon">🧭</div>
+                  <h2 className="empty-state-title">Página não encontrada (404)</h2>
+                  <p className="empty-state-description">
+                    A URL informada não corresponde a nenhuma rota configurada no React Router.
+                  </p>
+                  <Link to="/" className="btn-primary" style={{ textDecoration: 'none' }}>
+                    Voltar para o Painel Principal
+                  </Link>
+                </div>
+              }
+            />
           </Routes>
         </main>
 
@@ -246,4 +276,3 @@ export default function App() {
     </div>
   );
 }
-

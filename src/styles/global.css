@@ -931,3 +931,119 @@ button {
   }
 }
 
+
+/* Additional Styles for 11 Criteria Enhancements */
+.char-counter {
+  font-size: 0.74rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  margin-left: 0.35rem;
+}
+
+.form-success-banner {
+  background: rgba(34, 197, 94, 0.14);
+  border: 1px solid rgba(34, 197, 94, 0.4);
+  color: #86efac;
+  padding: 0.65rem 0.9rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.86rem;
+}
+
+.suggestions-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  flex-wrap: wrap;
+}
+
+.suggestions-loading {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  padding: 1rem 0;
+}
+
+.req-intro-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.25rem;
+}
+
+.concepts-overview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(265px, 1fr));
+  gap: 1rem;
+  margin: 1rem 0 1.25rem;
+}
+
+.concept-mini-card {
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 1.15rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+  transition: border-color 0.2s, transform 0.15s;
+}
+
+.concept-mini-card:hover {
+  border-color: rgba(56, 189, 248, 0.45);
+  transform: translateY(-2px);
+}
+
+.concept-mini-card-active {
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 1px var(--accent-primary);
+}
+
+.concept-number-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 30px;
+  height: 26px;
+  padding: 0 0.45rem;
+  border-radius: 6px;
+  background: rgba(129, 140, 248, 0.18);
+  color: #a5b4fc;
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.concept-mini-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.concept-mini-desc {
+  font-size: 0.84rem;
+  color: var(--text-secondary);
+  line-height: 1.45;
+  flex: 1;
+}
+
+.concept-explore-link {
+  background: none;
+  border: none;
+  padding: 0;
+  margin-top: 0.35rem;
+  color: #818cf8;
+  font-size: 0.84rem;
+  font-weight: 600;
+}
+
+.concept-explore-link:hover {
+  color: var(--accent-primary);
+  text-decoration: underline;
+}
+
+.req-badges-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}

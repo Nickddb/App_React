@@ -31,12 +31,12 @@ export default function Footer({
 
       <div className="footer-bottom">
         <p>
-          Desenvolvido com <strong>React 18</strong> + <strong>Vite</strong> •
-          Aplicação Prática dos Fundamentos: JSX, Componentes, Props, Listas & Keys,
-          Renderização Condicional e Virtual DOM.
+          Desenvolvido com <strong>React 18</strong> + <strong>React Router 6</strong> +{' '}
+          <strong>Vite</strong> • Contemplando os 11 critérios: JSX, Componentes, Props,
+          Virtual DOM, Listas &amp; Keys, Renderização Condicional, State &amp; useState,
+          Formulários, useEffect, Consumo de APIs e React Router.
         </p>
       </div>
     </footer>
   );
 }
-

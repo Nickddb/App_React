@@ -2,15 +2,22 @@ import React, { useState } from 'react';
 
 /**
  * Componente TaskForm:
- * Formulário controlado em React para entrada e validação de novas tarefas/metas.
+ * Formulário controlado em React (Critérios 07 - State/useState e 08 - Formulários)
+ * para receber, validar e processar informações de novas tarefas/metas.
  * Comunica-se com o componente Pai através da prop `onAddTask`.
  */
-export default function TaskForm({ onAddTask, categories, priorities }) {
+export default function TaskForm({
+  onAddTask,
+  categories,
+  priorities,
+  existingTasks = []
+}) {
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState(categories[0] || 'Estudos Gerais');
   const [priority, setPriority] = useState('media');
   const [notes, setNotes] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
   const [isExpanded, setIsExpanded] = useState(false);
 
   const handleSubmit = (event) => {
@@ -19,14 +26,32 @@ export default function TaskForm({ onAddTask, categories, priorities }) {
     const trimmedTitle = title.trim();
     if (!trimmedTitle) {
       setErrorMessage('Por favor, informe um título descritivo para a sua meta.');
+      setSuccessMessage('');
       return;
     }
 
     if (trimmedTitle.length < 3) {
       setErrorMessage('O título da meta deve possuir pelo menos 3 caracteres.');
+      setSuccessMessage('');
       return;
     }
 
+    if (trimmedTitle.length > 120) {
+      setErrorMessage('O título da meta deve ter no máximo 120 caracteres.');
+      setSuccessMessage('');
+      return;
+    }
+
+    const isDuplicate = existingTasks.some(
+      (task) => task.title.trim().toLowerCase() === trimmedTitle.toLowerCase()
+    );
+    if (isDuplicate) {
+      setErrorMessage('Já existe uma meta cadastrada com este mesmo título.');
+      setSuccessMessage('');
+      return;
+    }
+
+    // Processa e envia os dados validados ao componente Pai
     onAddTask({
       title: trimmedTitle,
       category,
@@ -34,11 +59,16 @@ export default function TaskForm({ onAddTask, categories, priorities }) {
       notes: notes.trim() || 'Meta cadastrada pelo usuário no painel.'
     });
 
-    // Limpa os campos após adicionar (atualização via Virtual DOM)
+    // Limpa os campos após adicionar (atualização via State / Virtual DOM)
     setTitle('');
     setNotes('');
     setPriority('media');
     setErrorMessage('');
+    setSuccessMessage(`Meta "${trimmedTitle}" validada e cadastrada com sucesso!`);
+
+    setTimeout(() => {
+      setSuccessMessage('');
+    }, 3500);
   };
 
   return (
@@ -46,10 +76,10 @@ export default function TaskForm({ onAddTask, categories, priorities }) {
       <div className="panel-header">
         <div>
           <h2 id="form-heading" className="panel-title">
-            ➕ Nova Meta ou Tarefa
+            ➕ Nova Meta ou Tarefa (Formulário Controlado)
           </h2>
           <p className="panel-description">
-            Adicione novos objetivos e observe a atualização instantânea via Virtual DOM.
+            Receba, valide e processe novas metas com <code>useState</code> e atualização instantânea no Virtual DOM.
           </p>
         </div>
         <button
@@ -65,13 +95,14 @@ export default function TaskForm({ onAddTask, categories, priorities }) {
         <div className="form-row-main">
           <div className="form-group form-group-title">
             <label htmlFor="task-title" className="form-label">
-              Título da Meta *
+              Título da Meta * <span className="char-counter">({title.length}/120)</span>
             </label>
             <input
               id="task-title"
               type="text"
+              maxLength={120}
               className={`form-input ${errorMessage ? 'input-error' : ''}`}
-              placeholder="Ex.: Revisar conceitos de Props e Renderização Condicional..."
+              placeholder="Ex.: Revisar conceitos de useState, useEffect e React Router..."
               value={title}
               onChange={(e) => {
                 setTitle(e.target.value);
@@ -146,8 +177,14 @@ export default function TaskForm({ onAddTask, categories, priorities }) {
             ⚠️ {errorMessage}
           </div>
         )}
+
+        {/* Renderização Condicional (&&): Exibe confirmação de processamento bem-sucedido */}
+        {successMessage && (
+          <div className="form-success-banner" role="status">
+            ✅ {successMessage}
+          </div>
+        )}
       </form>
     </section>
   );
 }
-
